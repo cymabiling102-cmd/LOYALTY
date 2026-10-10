@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>For You 💖</title>
+  <meta name="description" content="A tiny, sweet webpage to make someone smile." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#1b1c2e; --bg2:#2b0f3a; --pink:#ff79c6; --hot:#ff4d6d; --gold:#ffd166; --mint:#b7f0e6; --white:#fff; --muted:#b8b8d4; --card:#221f3b;
+    }
+    *{box-sizing:border-box}
+    html,body{min-height:100%; width:100%;}
+    body{
+      margin:0; color:var(--white); font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 10% 10%, rgba(255,121,198,.15), transparent 60%),
+                  radial-gradient(1200px 800px at 90% 10%, rgba(183,240,230,.12), transparent 60%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+      overflow-wrap:anywhere;
+    }
+    .container{
+      width:min(100%, 1100px); margin:0 auto; padding:clamp(12px, 3vw, 28px); position:relative;
+    }
+    header{display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between; padding:12px 0 24px}
+    header > div:first-child{min-width:0; flex:1 1 280px}
+    .nameplate{max-width:100%}
+    .title{
+      font-family:Pacifico, cursive; font-size: clamp(28px, 6vw, 56px); line-height:1.05; letter-spacing:.5px;
+      background: linear-gradient(90deg, #ff4d6d, #ffd166, #b7f0e6, #ff79c6);
+      -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:0 0 20px rgba(255,255,255,.1);
+    }
+    .subtitle{color:var(--muted); margin-top:6px; font-weight:300}
+
+    /* Floating hearts (pure CSS) */
+    .hearts{position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0}
+    .hearts span{
+      position:absolute; bottom:-40px; width:18px; height:18px; background:var(--hot);
+      transform:translateX(-50%); left:var(--x);
+      opacity:.8; border-radius:50% 50% 50% 0; transform:rotate(45deg);
+      animation:rise var(--dur) linear var(--delay) infinite;
+      box-shadow: -10px 10px 0 -8px var(--hot);
+      filter:drop-shadow(0 0 6px rgba(255,77,109,.4));
+    }
+    @keyframes rise{
+      0%{transform:translate(-50%,0) rotate(45deg); opacity:.0}
+      10%{opacity:.9}
+      100%{transform:translate(-50%,-120vh) rotate(45deg); opacity:0}
+    }
+
+    .card{
+      position:relative; z-index:1; background:rgba(34,31,59,.6); backdrop-filter: blur(8px);
+      border:1px solid rgba(255,255,255,.08); border-radius:24px; padding:clamp(14px, 2.5vw, 28px); box-shadow:0 10px 40px rgba(0,0,0,.35);
+    }
+    .grid{display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:clamp(14px, 2.5vw, 24px); align-items:start}
+    .grid > *{min-width:0}
+    @media (max-width:760px){.grid{grid-template-columns:minmax(0, 1fr)}}
+    @media (min-width:761px){.photo{min-height:clamp(220px, 34vw, 390px)}}
+
+    .photo{
+      border-radius:20px; overflow:hidden; min-height:320px; background:linear-gradient(135deg, rgba(255,77,109,.25), rgba(183,240,230,.15));
+      display:grid; place-items:center; border:1px dashed rgba(255,255,255,.2)
+    }
+    .photo small{color:var(--muted)}
+
+    .note{display:flex; flex-direction:column; gap:14px}
+    .note p{margin:0; color:#f4f4ff}
+    .note .badge{display:inline-block; padding:8px 14px; border-radius:999px; background:rgba(255,209,102,.12); color:var(--gold); font-weight:600; letter-spacing:.3px}
+
+    .reasons{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:8px}
+    @media (max-width:680px){.reasons{grid-template-columns:1fr 1fr}}
+
+    .flip{
+      perspective:900px; height:120px;
+    }
+    .flip > div{
+      position:relative; height:100%; transform-style:preserve-3d; transition:transform .8s cubic-bezier(.2,.8,.2,1)
+    }
+    .flip:hover > div{transform:rotateY(180deg)}
+    .face{
+      position:absolute; inset:0; display:grid; place-items:center; padding:12px; text-align:center; border-radius:16px;
+      border:1px solid rgba(255,255,255,.08)
+    }
+    .front{background:rgba(255,255,255,.06)}
+    .back{background:rgba(255,77,109,.18); transform:rotateY(180deg)}
+
+
+    /* === EDITABLE FLIP FRONT IMAGES === */
+    .reasons{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:clamp(8px, 1.5vw, 16px);
+      margin-top:8px;
+    }
+    .flip{
+      perspective:1100px;
+      height:175px;
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+    .flip > div{
+      position:relative;
+      height:100%;
+      width:100%;
+      transform-style:preserve-3d;
+      transition:transform .75s cubic-bezier(.2,.8,.2,1);
+    }
+    .flip:hover > div,
+    .flip:focus-within > div{transform:rotateY(180deg)}
+    .face{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0;
+      text-align:center;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      overflow:hidden;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      box-shadow:0 14px 35px rgba(0,0,0,.18);
+    }
+    .front{
+      background:rgba(255,255,255,.05);
+    }
+    .front img{ 
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:cover;
+    }
+    .back{
+      background:linear-gradient(135deg,rgba(255,77,109,.28),rgba(184,108,255,.25));
+      transform:rotateY(180deg);
+      font-size:16px;
+      line-height:1.5;
+      color:#fff;
+    }
+    .flip-hint{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+    @media (max-width:420px){
+      .reasons{grid-template-columns:1fr}
+      .flip{height:clamp(145px, 48vw, 190px)}
+      .title{font-size:clamp(27px, 9vw, 38px)}
+      .subtitle{font-size:14px}
+      .pill{font-size:12px; padding:7px 10px}
+      .note .badge{font-size:13px; padding:7px 11px}
+      .back{font-size:14px; padding:10px}
+    }
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation-duration:.01ms !important; transition-duration:.01ms !important}
+    }
+
+    /* Secret message (no JS) */
+    .secret{margin-top:18px; border-top:1px dashed rgba(255,255,255,.14); padding-top:16px}
+    .secret label{
+      display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none;
+      padding:10px 14px; border-radius:999px; background:rgba(255,121,198,.12); border:1px solid rgba(255,121,198,.22);
+    }
+    .secret label .heart{display:inline-block; width:22px; height:22px; position:relative}
+    .heart::before, .heart::after{
+      content:""; position:absolute; width:12px; height:18px; background:var(--pink); border-radius:12px 12px 0 0; top:2px;
+      box-shadow:0 4px 14px rgba(255,121,198,.35)
+    }
+    .heart::before{left:3px; transform:rotate(-45deg); transform-origin:0 100%}
+    .heart::after{left:8px; transform:rotate(45deg); transform-origin:100% 100%}
+
+    #toggle{display:none}
+    #toggle ~ .reveal{max-height:0; overflow:hidden; transition:max-height .8s ease}
+    #toggle:checked ~ .reveal{max-height:1200px}
+    #toggle{position:absolute; opacity:0; width:1px; height:1px}
+    .flip.is-flipped > div{transform:rotateY(180deg)}
+    .flip:focus-visible{outline:2px solid var(--mint); outline-offset:4px; border-radius:18px}
+    .reveal .letter{
+      margin-top:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px; line-height:1.65
+    }
+
+    footer{margin:28px 0 10px; text-align:center; color:var(--muted); font-size:14px}
+
+    /* Cute button */
+    .cta{
+      margin-top:14px; display:inline-block; padding:12px 18px; border-radius:14px;
+      border:1px solid rgba(183,240,230,.35); background:linear-gradient(180deg, rgba(183,240,230,.2), rgba(183,240,230,.08));
+      color:var(--mint); font-weight:700; letter-spacing:.3px; text-decoration:none; box-shadow:0 10px 24px rgba(0,0,0,.25);
+      transform:translateY(0); transition:transform .2s ease, box-shadow .2s ease
+    }
+    .cta:hover{transform:translateY(-2px); box-shadow:0 14px 28px rgba(0,0,0,.3)}
+
+    /* Nameplate */
+    .nameplate{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+    .pill{padding:8px 12px; border-radius:999px; background:rgba(255,209,102,.12); color:var(--gold); border:1px solid rgba(255,209,102,.2); font-weight:600}
+  </style>
+</head>
+<body>
+  <!-- Floating hearts -->
+  <div class="hearts" aria-hidden="true">
+    <!-- Duplicate spans with different CSS variables for randomized positions/timing -->
+    <span style="--x:8%; --dur:13s; --delay:0s"></span>
+    <span style="--x:16%; --dur:10s; --delay:2s"></span>
+    <span style="--x:24%; --dur:12s; --delay:1s"></span>
+    <span style="--x:32%; --dur:11s; --delay:3s"></span>
+    <span style="--x:40%; --dur:14s; --delay:0s"></span>
+    <span style="--x:48%; --dur:9s; --delay:1s"></span>
+    <span style="--x:56%; --dur:12s; --delay:2.5s"></span>
+    <span style="--x:64%; --dur:10s; --delay:3.2s"></span>
+    <span style="--x:72%; --dur:13s; --delay:1.6s"></span>
+    <span style="--x:80%; --dur:9.5s; --delay:2.4s"></span>
+    <span style="--x:88%; --dur:12.5s; --delay:0.8s"></span>
+  </div>
+
+  <div class="container">
+    <header>
+      <div>
+        <div class="title">Hi, <span id="crush-name">Crush</span>! ✨</div>
+        <div class="subtitle">I made a tiny corner of the internet… just for you.</div>
+      </div>
+      <div class="nameplate">
+        <span class="pill">Made with 💗</span>
+        <span class="pill">by <strong id="your-name">CY(loyal)</strong></span>
+      </div>
+    </header>
+
+    <section class="card grid">
+      <div class="photo">
+        <!-- Replace the img src below with your photo URL or leave the placeholder -->
+        <!-- <img src="your-photo.jpg" alt="A nice photo" style="width:100%; height:100%; object-fit:cover"> -->
+        <small>Drop a cute photo here 📸 (optional)</small>
+      </div>
+      <div class="note">
+        <span class="badge">A few reasons you’re awesome</span>
+        <div class="reasons">
+          <div class="flip" tabindex="0" aria-label="Flip card 1">
+            <div>
+              <div class="face front"><img src="crushise/img1.jpg" alt="Editable front card 1"></div>
+              <div class="face back">The way you talking feels like bloger ahha </div>
+            </div>
+          </div>
+          <div class="flip" tabindex="0" aria-label="Flip card 2">
+            <div>
+              <div class="face front"><img src="crushise/img3.jpg" alt="Editable front card 2"></div>
+              <div class="face back">The world feels softer around you</div>
+            </div>
+          </div>
+          <div class="flip" tabindex="0" aria-label="Flip card 3">
+            <div>
+              <div class="face front"><img src="crushise/img4.jpg" alt="Editable front card 3"></div>
+              <div class="face back">I catch myself smiling back, every time 🙂</div>
+            </div>
+          </div>
+          <div class="flip" tabindex="0" aria-label="Flip card 4">
+            <div>
+              <div class="face front"><img src="crushise/img2.jpg" alt="Editable front card 4"></div>
+              <div class="face back">Kung paano ka magalit at mainis ang cute</div>
+            </div>
+          </div>
+          <div class="flip" tabindex="0" aria-label="Flip card 5">
+            <div>
+              <div class="face front"><img src="crushise/img5.jpg" alt="Editable front card 5"></div>
+              <div class="face back">Pano ka mamorma kuhang kuha ako haha </div>
+            </div>
+          </div>
+          <div class="flip" tabindex="0" aria-label="Flip card 6">
+            <div>
+              <div class="face front"><img src="crushise/img6.jpg" alt="Editable front card 6"></div>
+              <div class="face back">Simplest but Pretiest </div>
+            </div>
+          </div>
+        </div>
+        <div class="flip-hint">Hover or tap a card to reveal the message.</div>
+      </div>
+      <div class="secret">
+          <label for="toggle" title="Tap to reveal">
+            <span class="heart" aria-hidden="true"></span>
+            <strong>Tap to reveal a little note</strong>
+          </label>
+          <input type="checkbox" id="toggle" />
+          <div class="reveal">
+            <div class="letter">
+              Hi <span id="crush-name-2">Diona</span>,<br>
+             Alam mo, may gusto lang akong sabihin sa'yo na matagal ko nang gustong aminin at sayo ko lang to ginawa . 😅
+
+Sa dami ng taong nakilala ko, hindi ko in-expect na ikaw pala 'yung taong unti-unting magiging special sa akin nang ganito. Hindi ko alam kung kailan nagsimula, pero habang tumatagal, nare-realize kong hindi na lang pala simpleng pagkakaibigan 'yung nararamdaman ko para sa'yo.
+
+I'm not telling you this para may baguhin ka o dahil may ine-expect akong sagot. Gusto ko lang maging honest sa'yo, at mapatunayan ko sa sarile ko na lalake ako sa pag amin ko sayo . 
+
+And whatever you feel, I hope we can still be us. Ayokong mailang ka sa work or sa pag sasama . I just wanted you to know that, somewhere along the way, you became someone I like a little more than I planned. 🤍 SANA WAG MO IPAGKALAT BAKA LOKOHIN AKONG BUSTED SA UNANG PAG AMIN KO SA BABAE HAHA 
+            </div>
+            <a class="cta" href="https://www.facebook.com/cy.eriebert.cuevas.mabiling" target="_blank" rel="noopener">Message me?</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      P.S. If this page made you smile, mission accomplished. ✨
+    </footer>
+  </div>
+  <script>
+    // Tap/click flip cards on phones; keyboard users can activate with Enter or Space.
+    document.querySelectorAll('.flip').forEach(function(card){
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-pressed', 'false');
+      card.addEventListener('click', function(){
+        var flipped = card.classList.toggle('is-flipped');
+        card.setAttribute('aria-pressed', String(flipped));
+      });
+      card.addEventListener('keydown', function(event){
+        if(event.key === 'Enter' || event.key === ' '){
+          event.preventDefault();
+          card.click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
